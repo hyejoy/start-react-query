@@ -17,13 +17,24 @@ export function Posts() {
    *  - 쿼리키는 항상 배열, v4이상부터는 배열임
    * 2. 쿼리함수 : 데이터를 가져오기 위해 실행할 함수
    */
-  const { data } = useQuery({
+  const { data, isError, error, isLoading } = useQuery({
     queryKey: ["posts"],
     queryFn: fetchPosts,
   });
+  /**
+   * isFetching vs isLoading
+   * - isFetching : 비동기 쿼리가 해결되지 않았음을 의미한다.
+   *    가져오기를 완료하지 않았지만, 가져오기를 수행하는 axios나 graphQL호출 중일수도 있음
+   *
+   * - isLoading : 불러오기 상태에 있다는것을 의미함
+   *    쿼리 함수가 아직 해결되지 않았지만 캐시된 데이터도 없음
+   *    쿼리를 한번도 수행한적이 없으므로 가져오는 중이고, 표시할 캐시된 데이터가 없음
+   *
+   * - 캐시 데이터가 있는 경우와 없는 경우를 구분하는 것!
+   */
+  if (isLoading) return <h3>Loading...</h3>;
 
-  if (!data) return <div>Loading</div>;
-
+  if (isError) return <h3>{error.toString()}!</h3>;
   return (
     <>
       <ul>
