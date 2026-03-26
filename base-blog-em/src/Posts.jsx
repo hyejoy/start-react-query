@@ -6,7 +6,7 @@ import { PostDetail } from "./PostDetail";
 const maxPostPage = 10;
 
 export function Posts() {
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedPost, setSelectedPost] = useState(null);
 
   // replace with useQuery
@@ -18,8 +18,10 @@ export function Posts() {
    * 2. 쿼리함수 : 데이터를 가져오기 위해 실행할 함수
    */
   const { data, isError, error, isLoading } = useQuery({
-    queryKey: ["posts"],
-    queryFn: fetchPosts,
+    queryKey: ["posts", currentPage],
+    queryFn: () => fetchPosts(currentPage),
+
+    staleTime: 2000, // 2초
   });
   /**
    * isFetching vs isLoading
@@ -49,11 +51,21 @@ export function Posts() {
         ))}
       </ul>
       <div className="pages">
-        <button disabled onClick={() => {}}>
+        <button
+          disabled={currentPage <= 1}
+          onClick={() => {
+            setCurrentPage((prev) => prev - 1);
+          }}
+        >
           Previous page
         </button>
-        <span>Page {currentPage + 1}</span>
-        <button disabled onClick={() => {}}>
+        <span>Page {currentPage}</span>
+        <button
+          disabled={currentPage >= maxPostPage}
+          onClick={() => {
+            setCurrentPage((prev) => prev + 1);
+          }}
+        >
           Next page
         </button>
       </div>
