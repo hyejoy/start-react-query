@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { fetchPosts, deletePost, updatePost } from "./api";
 import { PostDetail } from "./PostDetail";
@@ -9,6 +9,18 @@ export function Posts() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedPost, setSelectedPost] = useState(null);
 
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (currentPage < maxPostPage) {
+      const nextPage = currentPage + 1;
+      queryClient.prefetchQuery({
+        queryKey: ["posts", nextPage],
+        queryFn: () => fetchPosts(nextPage),
+      });
+    }
+  }, [currentPage, queryClient]);
+
   // replace with useQuery
   /**
    * 쿼리 기능에 대해 말하자면, 어떤 데이터를 가져올지 알 수 있도록
@@ -17,7 +29,7 @@ export function Posts() {
    *  - 쿼리키는 항상 배열, v4이상부터는 배열임
    * 2. 쿼리함수 : 데이터를 가져오기 위해 실행할 함수
    */
-  const { data, isError, error, isLoading } = useQuery({
+  const { data, isError, error, isFetching } = useQuery({
     queryKey: ["posts", currentPage],
     queryFn: () => fetchPosts(currentPage),
 
@@ -34,7 +46,7 @@ export function Posts() {
    *
    * - 캐시 데이터가 있는 경우와 없는 경우를 구분하는 것!
    */
-  if (isLoading) return <h3>Loading...</h3>;
+  if (isFetching) return <h3> isFetching ... 캐시가져오기 진행중?</h3>;
 
   if (isError) return <h3>{error.toString()}!</h3>;
   return (
