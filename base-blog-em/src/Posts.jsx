@@ -53,7 +53,7 @@ export function Posts() {
    *
    * - 캐시 데이터가 있는 경우와 없는 경우를 구분하는 것!
    */
-  if (isFetching) return <h3> isFetching ... 캐시가져오기 진행중?</h3>;
+  if (isFetching) return <h3> isFetching ... 가져오기 수행 중 </h3>;
 
   if (isError) return <h3>{error.toString()}!</h3>;
   return (
@@ -63,7 +63,10 @@ export function Posts() {
           <li
             key={post.id}
             className="post-title"
-            onClick={() => setSelectedPost(post)}
+            onClick={() => {
+              deleteMutation.reset();
+              setSelectedPost(post);
+            }}
           >
             {post.title}
           </li>
